@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<script src="../node_modules/@vue/reactivity/dist/reactivity.global.js"></script>
+<script>
+
+  const { reactive, readonly, toRaw, markRaw, ref, effect } = VueReactivity;
+
+  function demo1 () {
+    const object = { name: 'zz' };
+    const proxy1 = readonly(object);
+    // If try to observe a readonly proxy, return the readonly version
+    const proxy2 = reactive(proxy1);
+    console.log(proxy1 === proxy2);
+  }
+
+  function demo2 () {
+    const object = { name: 'zz' };
+    const proxy1 = reactive(object);
+    // observed proxy can't observe again
+    const proxy2 = reactive(proxy1);
+    // origin object will be cached
+    const proxy3 = reactive(object);
+    console.log(proxy1 === proxy2);
+    console.log(proxy2 === proxy3);
+    console.log(proxy1 === proxy3);
+  }
+
+  function demo3 () {
+    const object = { name: 'zz' };
+    const proxy = reactive(object);
+    console.log(object === toRaw(proxy));
+    const object2 = { name: 'xx' };
+    // Object.defineProperty(object2,'__v_skip', {value: true, configurable: true, enumerable: true})
+    const proxy2 = reactive(markRaw(object2));
+    console.log('proxy2', proxy2);
+  }
+
+  function demo4 () {
+    const proxyArr = reactive([1, 2, 3]);
+    // so it isn't execute effects?
+    proxyArr.push(5);
+    // Symbol is not proxy
+    proxyArr[Symbol.hasInstance];
+  }
+
+  function demo5 () {
+    // ref unwrapping
+    const r = reactive({ name: ref('zz') });
+    console.log('r', r, r.name);
+    // ref unwrapping - does not apply for Array + integer key
+    const r1 = reactive([ref(1), 2, 3, 4]);
+    const r2 = reactive([1, 2, 3, 4]);
+    console.log('r1', r1, r1[0]);
+    console.log('r2', r2, r2[0]);
+    // effect(() => {
+    //   console.log('r2', JSON.stringify(r2));
+    // });
+    // setTimeout(() => {
+    //   r2[0] = 100;
+    // }, 1000);
+  }
+
+  function demo6 () {
+    const proxy = reactive({ name: 'zz', age: 12 });
+    // call toRaw convert a non-proxy object
+    proxy.name = reactive({ str: 'xx' });
+    proxy.age = 12;
+    console.log(proxy);
+  }
+
+  function demo7 () {
+    const obj = {};
+    const proto = { a: 1 };
+    const proxyProto = new Proxy(proto, {
+      get (target, key, receiver) {
+        return Reflect.get(target, key, receiver);
+      },
+      set (target, key, value, receiver) {
+        return Reflect.set(target, key, value, receiver);
+      }
+    });
+    Object.setPrototypeOf(obj, proxyProto);
+    const myProxy = new Proxy(obj, {
+      get (target, key, receiver) {
+        return Reflect.get(target, key, receiver);
+      },
+      set (target, key, value, receiver) {
+        return Reflect.set(target, key, value, receiver);
+      }
+    });
+    myProxy.a = 100;
+  }
+
+  // demo1();
+  // demo2();
+  // demo3();
+  // demo4();
+  // demo5();
+  // demo6();
+  // demo7();
+
+  // problem:
+  // 1. target.__v_isReadonly is true but why not log it in devtool console panel
+  // 2. how to set __v_raw ?
+  // __v_raw and __v_isReadonly will return by proxy get method
+  // 3. how to handle new property for object and array
+</script>
+</body>
+</html>
