@@ -1,5 +1,5 @@
-const DOMGlobals = ['window', 'document']
-const NodeGlobals = ['module', 'require']
+const DOMGlobals = ['window', 'document'];
+const NodeGlobals = ['module', 'require'];
 
 module.exports = {
   parser: '@typescript-eslint/parser',
@@ -64,6 +64,13 @@ module.exports = {
         'no-restricted-globals': ['error', ...NodeGlobals],
         'no-restricted-syntax': 'off'
       }
+    },
+    {
+      files: ['scripts/**', 'packages/sfc-playground/**'],
+      rules: {
+        'no-restricted-globals': 'off',
+        'no-restricted-syntax': 'off'
+      }
     }
   ]
-}
+};

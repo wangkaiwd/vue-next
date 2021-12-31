@@ -56,6 +56,7 @@ async function buildAll(targets) {
 async function runParallel(maxConcurrency, source, iteratorFn) {
   const ret = []
   const executing = []
+  // generate build Promise
   for (const item of source) {
     const p = Promise.resolve().then(() => iteratorFn(item, source))
     ret.push(p)
@@ -108,6 +109,7 @@ async function build(target) {
     { stdio: 'inherit' }
   )
 
+  // generate typescript declaration file
   if (buildTypes && pkg.types) {
     console.log()
     console.log(
@@ -116,7 +118,7 @@ async function build(target) {
 
     // build types
     const { Extractor, ExtractorConfig } = require('@microsoft/api-extractor')
-
+    console.log('build types');
     const extractorConfigPath = path.resolve(pkgDir, `api-extractor.json`)
     const extractorConfig =
       ExtractorConfig.loadFileAndPrepare(extractorConfigPath)
@@ -124,7 +126,7 @@ async function build(target) {
       localBuild: true,
       showVerboseMessages: true
     })
-
+    console.log('extractorResult',extractorResult);
     if (extractorResult.succeeded) {
       // concat additional d.ts to rolled-up dts
       const typesDir = path.resolve(pkgDir, 'types')
