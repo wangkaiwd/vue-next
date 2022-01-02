@@ -35,7 +35,7 @@ const commit = execa.sync('git', ['rev-parse', 'HEAD']).stdout.slice(0, 7)
 
 run()
 
-async function run() {
+async function run () {
   if (isRelease) {
     // remove build cache for release builds to avoid outdated enum values
     await fs.remove(path.resolve(__dirname, '../node_modules/.rts2_cache'))
@@ -49,11 +49,11 @@ async function run() {
   }
 }
 
-async function buildAll(targets) {
+async function buildAll (targets) {
   await runParallel(require('os').cpus().length, targets, build)
 }
 
-async function runParallel(maxConcurrency, source, iteratorFn) {
+async function runParallel (maxConcurrency, source, iteratorFn) {
   const ret = []
   const executing = []
   // generate build Promise
@@ -72,7 +72,7 @@ async function runParallel(maxConcurrency, source, iteratorFn) {
   return Promise.all(ret)
 }
 
-async function build(target) {
+async function build (target) {
   const pkgDir = path.resolve(`packages/${target}`)
   const pkg = require(`${pkgDir}/package.json`)
 
@@ -118,7 +118,7 @@ async function build(target) {
 
     // build types
     const { Extractor, ExtractorConfig } = require('@microsoft/api-extractor')
-    console.log('build types');
+    console.log('build types')
     const extractorConfigPath = path.resolve(pkgDir, `api-extractor.json`)
     const extractorConfig =
       ExtractorConfig.loadFileAndPrepare(extractorConfigPath)
@@ -126,7 +126,6 @@ async function build(target) {
       localBuild: true,
       showVerboseMessages: true
     })
-    console.log('extractorResult',extractorResult);
     if (extractorResult.succeeded) {
       // concat additional d.ts to rolled-up dts
       const typesDir = path.resolve(pkgDir, 'types')
@@ -147,7 +146,7 @@ async function build(target) {
     } else {
       console.error(
         `API Extractor completed with ${extractorResult.errorCount} errors` +
-          ` and ${extractorResult.warningCount} warnings`
+        ` and ${extractorResult.warningCount} warnings`
       )
       process.exitCode = 1
     }
@@ -156,7 +155,7 @@ async function build(target) {
   }
 }
 
-function checkAllSizes(targets) {
+function checkAllSizes (targets) {
   if (devOnly || (formats && !formats.includes('global'))) {
     return
   }
@@ -167,7 +166,7 @@ function checkAllSizes(targets) {
   console.log()
 }
 
-function checkSize(target) {
+function checkSize (target) {
   const pkgDir = path.resolve(`packages/${target}`)
   checkFileSize(`${pkgDir}/dist/${target}.global.prod.js`)
   if (!formats || formats.includes('global-runtime')) {
@@ -175,7 +174,7 @@ function checkSize(target) {
   }
 }
 
-function checkFileSize(filePath) {
+function checkFileSize (filePath) {
   if (!fs.existsSync(filePath)) {
     return
   }

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport'
+        content='width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0'>
+  <meta http-equiv='X-UA-Compatible' content='ie=edge'>
+  <title>Document</title>
+  <script src='../packages/runtime-dom/dist/runtime-dom.global.js'></script>
+</head>
+<body>
+<div id='app'></div>
+<script>
+  const { createApp, h, createVNode, render, reactive } = VueRuntimeDOM
+  const My = {
+    props: {
+      name: String
+    },
+    render () {
+      return h('p', this.name)
+    }
+  }
+  const App = {
+    setup () {
+      const state = reactive({ name: 'xx', age: 1 })
+      setTimeout(() => {
+        // state.name = 'zz'
+        state.age++
+        state.age++
+        state.age++
+        state.age++
+        state.age++
+      }, 2000)
+      return () => {
+        console.log('update')
+        return h('div', {}, state.age)
+      }
+    }
+  }
+  const vNode = createVNode(App)
+  render(vNode, document.querySelector('#app'))
+</script>
+</body>
+</html>

@@ -36,7 +36,7 @@ const runIfNotDry = isDryRun ? dryRun : run
 const getPkgRoot = pkg => path.resolve(__dirname, '../packages/' + pkg)
 const step = msg => console.log(chalk.cyan(msg))
 
-async function main() {
+async function main () {
   let targetVersion = args._[0]
 
   if (!targetVersion) {
@@ -61,7 +61,7 @@ async function main() {
       targetVersion = release.match(/\((.*)\)/)[1]
     }
   }
-
+  // version is invalid
   if (!semver.valid(targetVersion)) {
     throw new Error(`invalid target version: ${targetVersion}`)
   }
@@ -145,14 +145,14 @@ async function main() {
   console.log()
 }
 
-function updateVersions(version) {
+function updateVersions (version) {
   // 1. update root package.json
   updatePackage(path.resolve(__dirname, '..'), version)
   // 2. update all packages
   packages.forEach(p => updatePackage(getPkgRoot(p), version))
 }
 
-function updatePackage(pkgRoot, version) {
+function updatePackage (pkgRoot, version) {
   const pkgPath = path.resolve(pkgRoot, 'package.json')
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
   pkg.version = version
@@ -161,7 +161,7 @@ function updatePackage(pkgRoot, version) {
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
 }
 
-function updateDeps(pkg, depType, version) {
+function updateDeps (pkg, depType, version) {
   const deps = pkg[depType]
   if (!deps) return
   Object.keys(deps).forEach(dep => {
@@ -177,7 +177,7 @@ function updateDeps(pkg, depType, version) {
   })
 }
 
-async function publishPackage(pkgName, version, runIfNotDry) {
+async function publishPackage (pkgName, version, runIfNotDry) {
   if (skippedPackages.includes(pkgName)) {
     return
   }

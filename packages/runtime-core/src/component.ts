@@ -112,6 +112,7 @@ export interface FunctionalComponent<P = {}, E extends EmitsOptions = {}>
   extends ComponentInternalOptions {
   // use of any here is intentional so it can be a valid JSX Element constructor
   (props: P, ctx: Omit<SetupContext<E>, 'expose'>): any
+
   props?: ComponentPropsOptions<P>
   emits?: E | (keyof E)[]
   inheritAttrs?: boolean
@@ -121,6 +122,7 @@ export interface FunctionalComponent<P = {}, E extends EmitsOptions = {}>
 
 export interface ClassComponent {
   new (...args: any[]): ComponentPublicInstance<any, any, any, any, any>
+
   __vccOpts: ComponentOptions
 }
 
@@ -130,13 +132,11 @@ export interface ClassComponent {
  * values, e.g. checking if its a function or not. This is mostly for internal
  * implementation code.
  */
-export type ConcreteComponent<
-  Props = {},
+export type ConcreteComponent<Props = {},
   RawBindings = any,
   D = any,
   C extends ComputedOptions = ComputedOptions,
-  M extends MethodOptions = MethodOptions
-> =
+  M extends MethodOptions = MethodOptions> =
   | ComponentOptions<Props, RawBindings, D, C, M>
   | FunctionalComponent<Props, any>
 
@@ -144,13 +144,11 @@ export type ConcreteComponent<
  * A type used in public APIs where a component type is expected.
  * The constructor type is an artificial type returned by defineComponent().
  */
-export type Component<
-  Props = any,
+export type Component<Props = any,
   RawBindings = any,
   D = any,
   C extends ComputedOptions = ComputedOptions,
-  M extends MethodOptions = MethodOptions
-> =
+  M extends MethodOptions = MethodOptions> =
   | ConcreteComponent<Props, RawBindings, D, C, M>
   | ComponentPublicInstanceConstructor<Props>
 
@@ -446,7 +444,7 @@ const emptyAppContext = createAppContext()
 
 let uid = 0
 
-export function createComponentInstance(
+export function createComponentInstance (
   vnode: VNode,
   parent: ComponentInternalInstance | null,
   suspense: SuspenseBoundary | null
@@ -524,12 +522,12 @@ export function createComponentInstance(
     u: null,
     um: null,
     bum: null,
-    da: null,
-    a: null,
+    da: null, // deactivated
+    a: null, // activated
     rtg: null,
     rtc: null,
     ec: null,
-    sp: null
+    sp: null // setup
   }
   if (__DEV__) {
     instance.ctx = createDevRenderContext(instance)
@@ -564,7 +562,7 @@ export const unsetCurrentInstance = () => {
 
 const isBuiltInTag = /*#__PURE__*/ makeMap('slot,component')
 
-export function validateComponentName(name: string, config: AppConfig) {
+export function validateComponentName (name: string, config: AppConfig) {
   const appIsNativeTag = config.isNativeTag || NO
   if (isBuiltInTag(name) || appIsNativeTag(name)) {
     warn(
@@ -573,13 +571,13 @@ export function validateComponentName(name: string, config: AppConfig) {
   }
 }
 
-export function isStatefulComponent(instance: ComponentInternalInstance) {
+export function isStatefulComponent (instance: ComponentInternalInstance) {
   return instance.vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT
 }
 
 export let isInSSRComponentSetup = false
 
-export function setupComponent(
+export function setupComponent (
   instance: ComponentInternalInstance,
   isSSR = false
 ) {
@@ -597,7 +595,7 @@ export function setupComponent(
   return setupResult
 }
 
-function setupStatefulComponent(
+function setupStatefulComponent (
   instance: ComponentInternalInstance,
   isSSR: boolean
 ) {
@@ -622,8 +620,8 @@ function setupStatefulComponent(
     if (Component.compilerOptions && isRuntimeOnly()) {
       warn(
         `"compilerOptions" is only supported when using a build of Vue that ` +
-          `includes the runtime compiler. Since you are using a runtime-only ` +
-          `build, the options should be passed via your build tool config instead.`
+        `includes the runtime compiler. Since you are using a runtime-only ` +
+        `build, the options should be passed via your build tool config instead.`
       )
     }
   }
@@ -671,7 +669,7 @@ function setupStatefulComponent(
       } else if (__DEV__) {
         warn(
           `setup() returned a Promise, but the version of Vue you are using ` +
-            `does not support it yet.`
+          `does not support it yet.`
         )
       }
     } else {
@@ -682,7 +680,7 @@ function setupStatefulComponent(
   }
 }
 
-export function handleSetupResult(
+export function handleSetupResult (
   instance: ComponentInternalInstance,
   setupResult: unknown,
   isSSR: boolean
@@ -700,7 +698,7 @@ export function handleSetupResult(
     if (__DEV__ && isVNode(setupResult)) {
       warn(
         `setup() should not return VNodes directly - ` +
-          `return a render function instead.`
+        `return a render function instead.`
       )
     }
     // setup returned bindings.
@@ -734,7 +732,7 @@ let installWithProxy: (i: ComponentInternalInstance) => void
  * For runtime-dom to register the compiler.
  * Note the exported method uses any to avoid d.ts relying on the compiler types.
  */
-export function registerRuntimeCompiler(_compile: any) {
+export function registerRuntimeCompiler (_compile: any) {
   compile = _compile
   installWithProxy = i => {
     if (i.render!._rc) {
@@ -746,7 +744,7 @@ export function registerRuntimeCompiler(_compile: any) {
 // dev only
 export const isRuntimeOnly = () => !compile
 
-export function finishComponentSetup(
+export function finishComponentSetup (
   instance: ComponentInternalInstance,
   isSSR: boolean,
   skipOptions?: boolean
@@ -829,14 +827,14 @@ export function finishComponentSetup(
     if (!compile && Component.template) {
       warn(
         `Component provided template option but ` +
-          `runtime compilation is not supported in this build of Vue.` +
-          (__ESM_BUNDLER__
-            ? ` Configure your bundler to alias "vue" to "vue/dist/vue.esm-bundler.js".`
-            : __ESM_BROWSER__
+        `runtime compilation is not supported in this build of Vue.` +
+        (__ESM_BUNDLER__
+          ? ` Configure your bundler to alias "vue" to "vue/dist/vue.esm-bundler.js".`
+          : __ESM_BROWSER__
             ? ` Use "vue.esm-browser.js" instead.`
             : __GLOBAL__
-            ? ` Use "vue.global.js" instead.`
-            : ``) /* should not happen */
+              ? ` Use "vue.global.js" instead.`
+              : ``) /* should not happen */
       )
     } else {
       warn(`Component is missing template or render function.`)
@@ -844,35 +842,35 @@ export function finishComponentSetup(
   }
 }
 
-function createAttrsProxy(instance: ComponentInternalInstance): Data {
+function createAttrsProxy (instance: ComponentInternalInstance): Data {
   return new Proxy(
     instance.attrs,
     __DEV__
       ? {
-          get(target, key: string) {
-            markAttrsAccessed()
-            track(instance, TrackOpTypes.GET, '$attrs')
-            return target[key]
-          },
-          set() {
-            warn(`setupContext.attrs is readonly.`)
-            return false
-          },
-          deleteProperty() {
-            warn(`setupContext.attrs is readonly.`)
-            return false
-          }
+        get (target, key: string) {
+          markAttrsAccessed()
+          track(instance, TrackOpTypes.GET, '$attrs')
+          return target[key]
+        },
+        set () {
+          warn(`setupContext.attrs is readonly.`)
+          return false
+        },
+        deleteProperty () {
+          warn(`setupContext.attrs is readonly.`)
+          return false
         }
+      }
       : {
-          get(target, key: string) {
-            track(instance, TrackOpTypes.GET, '$attrs')
-            return target[key]
-          }
+        get (target, key: string) {
+          track(instance, TrackOpTypes.GET, '$attrs')
+          return target[key]
         }
+      }
   )
 }
 
-export function createSetupContext(
+export function createSetupContext (
   instance: ComponentInternalInstance
 ): SetupContext {
   const expose: SetupContext['expose'] = exposed => {
@@ -887,20 +885,20 @@ export function createSetupContext(
     // We use getters in dev in case libs like test-utils overwrite instance
     // properties (overwrites should not be done in prod)
     return Object.freeze({
-      get attrs() {
+      get attrs () {
         return attrs || (attrs = createAttrsProxy(instance))
       },
-      get slots() {
+      get slots () {
         return shallowReadonly(instance.slots)
       },
-      get emit() {
+      get emit () {
         return (event: string, ...args: any[]) => instance.emit(event, ...args)
       },
       expose
     })
   } else {
     return {
-      get attrs() {
+      get attrs () {
         return attrs || (attrs = createAttrsProxy(instance))
       },
       slots: instance.slots,
@@ -910,12 +908,12 @@ export function createSetupContext(
   }
 }
 
-export function getExposeProxy(instance: ComponentInternalInstance) {
+export function getExposeProxy (instance: ComponentInternalInstance) {
   if (instance.exposed) {
     return (
       instance.exposeProxy ||
       (instance.exposeProxy = new Proxy(proxyRefs(markRaw(instance.exposed)), {
-        get(target, key: string) {
+        get (target, key: string) {
           if (key in target) {
             return target[key]
           } else if (key in publicPropertiesMap) {
@@ -931,7 +929,7 @@ const classifyRE = /(?:^|[-_])(\w)/g
 const classify = (str: string): string =>
   str.replace(classifyRE, c => c.toUpperCase()).replace(/[-_]/g, '')
 
-export function getComponentName(
+export function getComponentName (
   Component: ConcreteComponent
 ): string | undefined {
   return isFunction(Component)
@@ -940,7 +938,7 @@ export function getComponentName(
 }
 
 /* istanbul ignore next */
-export function formatComponentName(
+export function formatComponentName (
   instance: ComponentInternalInstance | null,
   Component: ConcreteComponent,
   isRoot = false
@@ -965,13 +963,13 @@ export function formatComponentName(
     name =
       inferFromRegistry(
         instance.components ||
-          (instance.parent.type as ComponentOptions).components
+        (instance.parent.type as ComponentOptions).components
       ) || inferFromRegistry(instance.appContext.components)
   }
 
   return name ? classify(name) : isRoot ? `App` : `Anonymous`
 }
 
-export function isClassComponent(value: unknown): value is ClassComponent {
+export function isClassComponent (value: unknown): value is ClassComponent {
   return isFunction(value) && '__vccOpts' in value
 }

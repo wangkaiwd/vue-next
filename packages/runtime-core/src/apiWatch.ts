@@ -209,8 +209,7 @@ function doWatch(
   } else if (isReactive(source)) {
     getter = () => source
     deep = true
-  } else if (isArray(source)) {
-    isMultiSource = true
+  } else if (isArray(source)) {isMultiSource = true
     forceTrigger = source.some(isReactive)
     getter = () =>
       source.map(s => {

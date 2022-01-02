@@ -80,9 +80,6 @@ function createArrayInstrumentations () {
 
 function createGetter (isReadonly = false, shallow = false) {
   return function get (target: Target, key: string | symbol, receiver: object) {
-    console.log('get-key', key);
-    console.log('get-target', target);
-    console.log('get-receiver', receiver);
     if (key === ReactiveFlags.IS_REACTIVE) {
       return !isReadonly;
     } else if (key === ReactiveFlags.IS_READONLY) {
@@ -151,10 +148,6 @@ function createSetter (shallow = false) {
     value: unknown,
     receiver: object
   ): boolean {
-    console.log('set-key', key);
-    console.log('set-target', target);
-    console.log('set-value', value);
-    console.log('set-receiver', receiver);
     let oldValue = (target as any)[key];
     if (!shallow && !isReadonly(value)) {
       value = toRaw(value);
