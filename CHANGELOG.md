@@ -1,3 +1,14 @@
+## [3.2.27-beta.1](https://github.com/wangkaiwd/vue-next/compare/v3.2.26...v3.2.27-beta.1) (2022-01-03)
+
+
+### Features
+
+* create demo for async update ([5b9237e](https://github.com/wangkaiwd/vue-next/commit/5b9237e8f8363de587e87c0fe717d9b97a44b7de))
+* debug some demo of vue3 reactivity ([e50a852](https://github.com/wangkaiwd/vue-next/commit/e50a852cd07e3b846326f5dcf464fa66d75f295c))
+* try build and generate type declaration file ([56fd955](https://github.com/wangkaiwd/vue-next/commit/56fd95505d93d4b9d42189893925f289ed99a0ce))
+
+
+
 ## [3.2.26](https://github.com/vuejs/vue-next/compare/v3.2.25...v3.2.26) (2021-12-12)
 
 

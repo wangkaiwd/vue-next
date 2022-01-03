@@ -6,7 +6,9 @@ const semver = require('semver')
 const currentVersion = require('../package.json').version
 const { prompt } = require('enquirer')
 const execa = require('execa')
-
+// minimist example:
+// node example/parse.js runtime-dom -t -skip --skipTests
+// {_:['runtime-dom'], t:true, s:true,k:true,i:true,p:true, skipTests: true}
 const preId =
   args.preid ||
   (semver.prerelease(currentVersion) && semver.prerelease(currentVersion)[0])
@@ -16,7 +18,7 @@ const skipBuild = args.skipBuild
 const packages = fs
   .readdirSync(path.resolve(__dirname, '../packages'))
   .filter(p => !p.endsWith('.ts') && !p.startsWith('.'))
-
+console.log('args', args)
 const skippedPackages = []
 
 const versionIncrements = [
