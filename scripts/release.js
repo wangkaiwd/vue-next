@@ -9,6 +9,7 @@ const execa = require('execa')
 // minimist example:
 // node example/parse.js runtime-dom -t -skip --skipTests
 // {_:['runtime-dom'], t:true, s:true,k:true,i:true,p:true, skipTests: true}
+
 const preId =
   args.preid ||
   (semver.prerelease(currentVersion) && semver.prerelease(currentVersion)[0])
@@ -18,7 +19,6 @@ const skipBuild = args.skipBuild
 const packages = fs
   .readdirSync(path.resolve(__dirname, '../packages'))
   .filter(p => !p.endsWith('.ts') && !p.startsWith('.'))
-console.log('args', args)
 const skippedPackages = []
 
 const versionIncrements = [
@@ -43,13 +43,14 @@ async function main () {
 
   if (!targetVersion) {
     // no explicit version, offer suggestions
+    // select way of bump version
     const { release } = await prompt({
       type: 'select',
       name: 'release',
       message: 'Select release type',
       choices: versionIncrements.map(i => `${i} (${inc(i)})`).concat(['custom'])
     })
-
+    // input custom release version
     if (release === 'custom') {
       targetVersion = (
         await prompt({
@@ -67,7 +68,7 @@ async function main () {
   if (!semver.valid(targetVersion)) {
     throw new Error(`invalid target version: ${targetVersion}`)
   }
-
+  // double check release version
   const { yes } = await prompt({
     type: 'confirm',
     name: 'yes',
@@ -89,11 +90,14 @@ async function main () {
 
   // update all package versions and inter-dependencies
   step('\nUpdating cross dependencies...')
+  // root and all other packages
+  // update package and dependencies, peerDependencies
   updateVersions(targetVersion)
 
   // build all packages with types
   step('\nBuilding all packages...')
   if (!skipBuild && !isDryRun) {
+    // execa: execute command in terminal
     await run('pnpm', ['run', 'build', '--', '--release'])
     // test generated dts files
     step('\nVerifying type declarations...')
@@ -107,9 +111,11 @@ async function main () {
   await run(`pnpm`, ['run', 'changelog'])
 
   // update pnpm-lock.yaml
+  // todo: What exactly do something of this line
   step('\nUpdating lockfile...')
   await run(`pnpm`, ['install', '--prefer-offline'])
 
+  // commit changed file
   const { stdout } = await run('git', ['diff'], { stdio: 'pipe' })
   if (stdout) {
     step('\nCommitting changes...')
@@ -128,6 +134,7 @@ async function main () {
   // push to GitHub
   step('\nPushing to GitHub...')
   await runIfNotDry('git', ['tag', `v${targetVersion}`])
+  // the same as git push origin v${targetVersion}
   await runIfNotDry('git', ['push', 'origin', `refs/tags/v${targetVersion}`])
   await runIfNotDry('git', ['push'])
 
@@ -158,8 +165,11 @@ function updatePackage (pkgRoot, version) {
   const pkgPath = path.resolve(pkgRoot, 'package.json')
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
   pkg.version = version
+  // update dependencies and peerDependencies of vue/@vue/** package.json
   updateDeps(pkg, 'dependencies', version)
+  // todo: why not update devDependencies ?
   updateDeps(pkg, 'peerDependencies', version)
+  // write new package.json to overwrite origin package.json
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
 }
 

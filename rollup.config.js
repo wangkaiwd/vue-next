@@ -15,7 +15,6 @@ const resolve = p => path.resolve(packageDir, p)
 const pkg = require(resolve(`package.json`))
 const packageOptions = pkg.buildOptions || {}
 const name = packageOptions.filename || path.basename(packageDir)
-
 // ensure TS checks only once for each build
 let hasTSChecked = false
 
@@ -71,7 +70,22 @@ if (process.env.NODE_ENV === 'production') {
     }
   })
 }
-
+// {
+//   input: '/Users/wangkai/workSpace/personalCode/study01/web/vue-next/packages/reactivity/src/index.ts',
+//     external: [ '@vue/shared', 'path', 'url', 'stream' ],
+//   plugins: [ [Object], [Object], [Object] ],
+//   output: {
+//   file: '/Users/wangkai/workSpace/personalCode/study01/web/vue-next/packages/reactivity/dist/reactivity.esm-bundler.js',
+//     format: 'es',
+//     exports: 'named',
+//     sourcemap: false,
+//     externalLiveBindings: false
+// },
+//   onwarn: [Function: onwarn],
+//   treeshake: { moduleSideEffects: false }
+// }
+// console.log('packageConfigs',packageConfigs)
+// final rollup config
 export default packageConfigs
 
 function createConfig(format, output, plugins = []) {

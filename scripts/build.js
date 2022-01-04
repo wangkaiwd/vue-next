@@ -128,7 +128,9 @@ async function build (target) {
     })
     if (extractorResult.succeeded) {
       // concat additional d.ts to rolled-up dts
+      // this logic not run
       const typesDir = path.resolve(pkgDir, 'types')
+      console.log('typesDir', typesDir)
       if (await fs.exists(typesDir)) {
         const dtsPath = path.resolve(pkgDir, pkg.types)
         const existing = await fs.readFile(dtsPath, 'utf-8')
@@ -150,7 +152,7 @@ async function build (target) {
       )
       process.exitCode = 1
     }
-
+    // delete origin old type declaration file directory packages
     await fs.remove(`${pkgDir}/dist/packages`)
   }
 }
